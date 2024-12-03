@@ -83,7 +83,8 @@ class DoTryCatchThrowsViewModel: ObservableObject {
             //if you're using try? it returns a optional type. if it can't be failed by default. because it returns a value or nil everytime. use it effectively.
             // try! -> not recommended it crashes the app if the it throws an error it automatically try to unwrap it, it also doesn't goes to catch block.
             self.text = (try? manager.getTitle4()) ?? "nil"
-        } catch { // no need of explicitly using error let declarations
+        } catch {
+            // no need of explicitly using error let declarations
             self.text = error.localizedDescription
         }
         
@@ -104,7 +105,6 @@ struct DoTryCatchThrows: View {
                 .foregroundStyle(Color.white)
                 .background(.blue)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
-                
                 .onTapGesture {
                     viewModel.fetchTitle()
                 }
