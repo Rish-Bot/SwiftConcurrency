@@ -70,7 +70,7 @@ This repository covers the following key concepts and implementations:
 
 1. Clone the repository:  
    ```bash  
-   git clone [<repository-url>](https://github.com/Rish-Bot/SwiftConcurrency.git)
+   git clone https://github.com/Rish-Bot/SwiftConcurrency.git
 
 ## 💙 Credits
 
