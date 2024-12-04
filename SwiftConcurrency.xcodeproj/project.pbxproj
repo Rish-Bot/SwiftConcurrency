@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DB87147E2D002B79007FEB41 /* Notes.md in Resources */ = {isa = PBXBuildFile; fileRef = DB87147D2D002B79007FEB41 /* Notes.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		DB3DDEBD2CFDA2630012DAB9 /* SwiftConcurrency.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftConcurrency.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB87147D2D002B79007FEB41 /* Notes.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Notes.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +37,7 @@
 		DB3DDEB42CFDA2630012DAB9 = {
 			isa = PBXGroup;
 			children = (
+				DB87147D2D002B79007FEB41 /* Notes.md */,
 				DB3DDEBF2CFDA2630012DAB9 /* SwiftConcurrency */,
 				DB3DDEBE2CFDA2630012DAB9 /* Products */,
 			);
@@ -109,6 +115,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB87147E2D002B79007FEB41 /* Notes.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
