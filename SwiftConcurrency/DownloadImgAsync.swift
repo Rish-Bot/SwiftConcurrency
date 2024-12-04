@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-//DataManager / Imageloader
+//MARK: - Data Manager / Image Loader
 class DownloadImgAsyncDataManager {
     
     let url = URL(string: "https://picsum.photos/200")!
     
     func downlaodImageWithCompletionHandler(completionHandler:@escaping (UIImage?, Error?) -> ()){
-       
+        
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard
                 let data = data,
@@ -33,25 +33,29 @@ class DownloadImgAsyncDataManager {
     
     // downlaod image with completion handler and result enum : small changes
     
-  /*  func downlaodImageWithCompletionHandlerWithResultEnum(completionHandler:@escaping (Result<UIImage, Error>) -> ()){
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard
-                let data = data,
-                let image = UIImage(data: data),
-                let resonse = response as? HTTPURLResponse,
-                resonse.statusCode >= 200 && resonse.statusCode < 300,
-                error == nil
-            else {
-                completionHandler(.failure(error?.localizedDescription))
-                return
-            }
-            completionHandler(.success(image))
-           
-        }
-        .resume()
-    }*/
+    /*  func downlaodImageWithCompletionHandlerWithResultEnum(completionHandler:@escaping (Result<UIImage, Error>) -> ()){
+     
+     URLSession.shared.dataTask(with: url) { data, response, error in
+     guard
+     let data = data,
+     let image = UIImage(data: data),
+     let resonse = response as? HTTPURLResponse,
+     resonse.statusCode >= 200 && resonse.statusCode < 300,
+     error == nil
+     else {
+     completionHandler(.failure(error?.localizedDescription))
+     return
+     }
+     completionHandler(.success(image))
+     
+     }
+     .resume()
+     }*/
     
+    /// Method: downlaodImageWithCompletionHandlerResultEnum
+    /// - Parameters:
+    ///   - url: URL used to fetch the data
+    ///   - completionHandler: Once event is done it automatically, return the result enum with UIImage else errors
     func downlaodImageWithCompletionHandlerResultEnum(from url: URL, completionHandler: @escaping (Result<UIImage, Error>) -> Void) {
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
@@ -74,19 +78,36 @@ class DownloadImgAsyncDataManager {
         }
         .resume()
     }
+    
+    //best way to do!
+    func downloadImageWithAsync() async throws -> UIImage?{
+        do{
+            let (data, _) = try await URLSession.shared.data(from: url, delegate:nil)
+            //validate the response like other methods how it use the guard for it
+            let image = UIImage(data: data)
+            return image
+        }
+        catch{
+            throw error
+        }
+    }
 }
+//MARK: - ViewModel
 
-//viewModel
 class DownloadImgAsyncVM: ObservableObject {
     @Published var image: UIImage?
     let url = URL(string: "https://picsum.photos/200")!
     
     let dataManager: DownloadImgAsyncDataManager = DownloadImgAsyncDataManager()
     
+    //DirectWay
     func fetchImage() {
         self.image = UIImage(systemName: "heart.fill")
     }
     
+    
+    
+    //WithCompletionHandler
     func fetchImageWithCompletionHandler() {
         self.dataManager.downlaodImageWithCompletionHandler {[weak self] image, error in
             DispatchQueue.main.async {
@@ -95,12 +116,12 @@ class DownloadImgAsyncVM: ObservableObject {
             
         }
     }
-    
+    //WithCompletinHandler+ResultEnum
     func fetchImageWithCompletionHandlerResultEnum(){
         
         self.dataManager.downlaodImageWithCompletionHandlerResultEnum(from: url) { result in
             switch result {
-                case .success(let image):
+            case .success(let image):
                 DispatchQueue.main.async {
                     self.image = image
                 }
@@ -109,8 +130,20 @@ class DownloadImgAsyncVM: ObservableObject {
             }
         }
     }
+    //WithCleanWay! Async-Await-Task when you're in async env use Actor don't go and use the
+    func fetchImageWithAsyncTask() async{
+        
+        //similar to main thread!
+        let image = try? await self.dataManager.downloadImageWithAsync()
+        await MainActor.run{
+            self.image = image
+        }
+        
+    }
+    
 }
 
+//MARK: - View (SwiftUI)
 struct DownloadImgAsync: View {
     @StateObject private var viewModel = DownloadImgAsyncVM()
     var body: some View {
@@ -126,7 +159,9 @@ struct DownloadImgAsync: View {
             }
             
             Button("New Image") {
-                viewModel.fetchImageWithCompletionHandlerResultEnum()
+                Task{
+                    await viewModel.fetchImageWithAsyncTask()
+                }
             }.padding()
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
@@ -134,7 +169,10 @@ struct DownloadImgAsync: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .onAppear {
-            viewModel.fetchImageWithCompletionHandlerResultEnum()
+            Task{
+                await viewModel.fetchImageWithAsyncTask()
+            }
+            
         }
         
         
