@@ -52,7 +52,7 @@ class DownloadImgAsyncDataManager {
         .resume()
     }*/
     
-    func downloadImageWithCompletionHandlerCGPT(from url: URL, completionHandler: @escaping (Result<UIImage, Error>) -> Void) {
+    func downlaodImageWithCompletionHandlerResultEnum(from url: URL, completionHandler: @escaping (Result<UIImage, Error>) -> Void) {
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 completionHandler(.failure(error))
@@ -98,7 +98,7 @@ class DownloadImgAsyncVM: ObservableObject {
     
     func fetchImageWithCompletionHandlerResultEnum(){
         
-        self.dataManager.downloadImageWithCompletionHandlerCGPT(from: url) { result in
+        self.dataManager.downlaodImageWithCompletionHandlerResultEnum(from: url) { result in
             switch result {
                 case .success(let image):
                 DispatchQueue.main.async {
