@@ -13,7 +13,7 @@ class DownloadImgAsyncDataManager {
     let url = URL(string: "https://picsum.photos/200")!
     
     func downlaodImageWithCompletionHandler(completionHandler:@escaping (UIImage?, Error?) -> ()){
-        
+       
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard
                 let data = data,
@@ -31,11 +31,56 @@ class DownloadImgAsyncDataManager {
         .resume()
     }
     
+    // downlaod image with completion handler and result enum : small changes
+    
+  /*  func downlaodImageWithCompletionHandlerWithResultEnum(completionHandler:@escaping (Result<UIImage, Error>) -> ()){
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard
+                let data = data,
+                let image = UIImage(data: data),
+                let resonse = response as? HTTPURLResponse,
+                resonse.statusCode >= 200 && resonse.statusCode < 300,
+                error == nil
+            else {
+                completionHandler(.failure(error?.localizedDescription))
+                return
+            }
+            completionHandler(.success(image))
+           
+        }
+        .resume()
+    }*/
+    
+    func downloadImageWithCompletionHandlerCGPT(from url: URL, completionHandler: @escaping (Result<UIImage, Error>) -> Void) {
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completionHandler(.failure(error))
+                return
+            }
+            
+            guard
+                let data = data,
+                let image = UIImage(data: data),
+                let httpResponse = response as? HTTPURLResponse,
+                (200...299).contains(httpResponse.statusCode)
+            else {
+                let responseError = NSError(domain: "Invalid Response", code: 0, userInfo: nil)
+                completionHandler(.failure(responseError))
+                return
+            }
+            
+            completionHandler(.success(image))
+        }
+        .resume()
+    }
 }
 
 //viewModel
 class DownloadImgAsyncVM: ObservableObject {
     @Published var image: UIImage?
+    let url = URL(string: "https://picsum.photos/200")!
+    
     let dataManager: DownloadImgAsyncDataManager = DownloadImgAsyncDataManager()
     
     func fetchImage() {
@@ -44,11 +89,24 @@ class DownloadImgAsyncVM: ObservableObject {
     
     func fetchImageWithCompletionHandler() {
         self.dataManager.downlaodImageWithCompletionHandler {[weak self] image, error in
-            
             DispatchQueue.main.async {
                 self?.image = image
             }
             
+        }
+    }
+    
+    func fetchImageWithCompletionHandlerResultEnum(){
+        
+        self.dataManager.downloadImageWithCompletionHandlerCGPT(from: url) { result in
+            switch result {
+                case .success(let image):
+                DispatchQueue.main.async {
+                    self.image = image
+                }
+            case .failure(let error):
+                print(error)
+            }
         }
     }
 }
@@ -68,7 +126,7 @@ struct DownloadImgAsync: View {
             }
             
             Button("New Image") {
-                viewModel.fetchImageWithCompletionHandler()
+                viewModel.fetchImageWithCompletionHandlerResultEnum()
             }.padding()
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
@@ -76,7 +134,7 @@ struct DownloadImgAsync: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .onAppear {
-            viewModel.fetchImageWithCompletionHandler()
+            viewModel.fetchImageWithCompletionHandlerResultEnum()
         }
         
         
