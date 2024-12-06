@@ -78,10 +78,7 @@ class DoTryCatchThrowsViewModel: ObservableObject {
         //getTitleMethod: Throws
         
        
-        do { // we can keep multiple try blocks here not an issue.
-            //but if one this fails it will go to the catch block :) to handle this you can use try? or try!
-            //if you're using try? it returns a optional type. if it can't be failed by default. because it returns a value or nil everytime. use it effectively.
-            // try! -> not recommended it crashes the app if the it throws an error it automatically try to unwrap it, it also doesn't goes to catch block.
+        do {
             self.text = (try? manager.getTitle4()) ?? "nil"
         } catch {
             // no need of explicitly using error let declarations
@@ -116,3 +113,18 @@ struct DoTryCatchThrows: View {
 #Preview {
     DoTryCatchThrows()
 }
+
+/*Notes
+ Do :  we can keep multiple try blocks here not an issue.but if one this fails it will go to the catch block :) to handle this you can use try.
+ 
+ Try : It try to execute the code,
+ 
+ if you're using try? it returns a optional type. if it can't be failed by default. because it returns a value or nil everytime it never go to catch block. use it effectively.
+    
+ try! -> not recommended it crashes the app if the it throws an error it automatically try to unwrap it or suppose if the value is nil it trys to unwrap and endup in the fatal error, it also doesn't goes to catch block.
+ 
+ Catch : catch the errors - no need of explicitly using error let declarations
+ 
+ Throws : the func / method is eligible to throw an error
+ Throw : it throw an error
+ */
