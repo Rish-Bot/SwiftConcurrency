@@ -13,10 +13,24 @@ class asyncAwaitDeepdiveVM : ObservableObject {
         dataArray.append("Welcome to deepDive into Async-Await")
     }
     
-    func addAuthor1() async throws {
-        dataArray.append("Author1")
+    func addAuthor1() async  {
+        try? await Task.sleep(for: .seconds(1))
+        print(Task.currentPriority)
+
+        await MainActor.run {
+            dataArray.append("Author1")
+            print(Thread.current.isMainThread)
+        }
+        
         
     }
+    func addAuthor2() async {
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        print(Task.currentPriority)
+        print(Thread.current.isMainThread)
+        dataArray.append("Author2")
+    }
+    
 }
 
 struct async_await_deepdive: View {
@@ -30,7 +44,8 @@ struct async_await_deepdive: View {
         .onAppear{
             viewModel.addData()
             Task{
-                try? await viewModel.addAuthor1()
+                 await viewModel.addAuthor1()
+                await viewModel.addAuthor2()
             }
         }
         
@@ -49,4 +64,8 @@ struct async_await_deepdive: View {
  Since both the Async-Await is there it's no necessary it always run in the main thread some action may run in background thread also.
  
  
+ * All the task are async in nature
+ * Always use actor in func with async and await: don't use dispatch queues even you could do that!
+ * await is gonna wait till the line of code is running and then only rest of the code will run it act as a suspend point
+ * await it's not necessary to run the code in the BG or main thread it choose on it's own use the actor if you wanna control the thread execution or you can use!
  */
