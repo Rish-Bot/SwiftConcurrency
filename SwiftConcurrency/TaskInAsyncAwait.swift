@@ -26,3 +26,8 @@ struct TaskInAsyncAwait: View {
 #Preview {
     TaskInAsyncAwait()
 }
+
+
+/*
+ Notes : Task yield : it's a wait yield and execute next all the things 
+ */
