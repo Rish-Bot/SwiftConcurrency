@@ -29,5 +29,10 @@ struct TaskInAsyncAwait: View {
 
 
 /*
- Notes : Task yield : it's a wait yield and execute next all the things 
+ Notes:)
+ >>  Task yield : it's a wait yield and execute next all the things
+ >>  You can add the detach task to add the detachment to the praent task
+ >>  Don't use the detach task if it's possible.
+ >>  Task cancel also a great way to cancel suppose if the call is working when it's not necessary at all -
+ >> .task{ } in SwiftUI automatically cancel task if the view disappears automatically. 
  */
